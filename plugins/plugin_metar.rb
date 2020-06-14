@@ -4,12 +4,17 @@ module BotPlugins
         Commands = ["/metar", "/taf"]
 
         def self.process(message)
-            icao = message.text.split(' ').last
-            command = message.text.split(' ').first
+            command_array = message.text.split(' ')
+            if command_array.length != 2 then
+                return "Usage: <pre>/metar ICAO</pre>"
+            end
+
+            icao = command_array.last
+            command = command_array.first.slice(1, 5)
 
             # Make that request!
             begin
-                response = Faraday.get("https://avwx.rest/api/metar/#{icao}") do | req |
+                response = Faraday.get("https://avwx.rest/api/#{command}/#{icao}") do | req |
                     # Params
                     req.params['format'] = 'json'
                     req.params['onfail'] = 'cache'
@@ -36,7 +41,7 @@ module BotPlugins
             end
 
             # Normal raw METAR response
-            "`#{response_json["raw"]}`"
+            "<pre>#{response_json["raw"]}</pre>"
 
         end
     end
