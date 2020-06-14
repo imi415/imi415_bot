@@ -36,7 +36,7 @@ module BotPlugins
             end
 
             # Normal raw METAR response
-            "`response_json["raw"]`"
+            "`#{response_json["raw"]}`"
 
         end
     end
