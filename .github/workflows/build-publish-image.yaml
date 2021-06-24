@@ -27,5 +27,5 @@ jobs:
           context: "./"
           file: "./Dockerfile"
           push: true
-          tags: "${{ github.repository_owner }}/imi415-bot:${{ steps.extract_branch.outputs.branch }}"
+          tags: "ghcr.io/${{ github.repository_owner }}/imi415-bot:${{ steps.extract_branch.outputs.branch }}"
 
