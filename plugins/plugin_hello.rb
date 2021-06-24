@@ -8,7 +8,8 @@ module BotPlugins
     
         # It will be called when a message start with above commands is received, do what you want here!
         def self.process(message)
-            "Hello World!!, #{message.chat.id}"
+            return { chat_id: message.chat_id, text: "Hello World!!, #{message.chat.id}" }
         end
     end
 end
+
