@@ -4,7 +4,7 @@ module BotPlugins
         Commands = ["/test"]
 
         def self.process(message)
-          { chat_id: message.chat_id, text: "<pre>This is a test plugin.</pre>" }
+          { chat_id: message.chat.id, text: "<pre>This is a test plugin.</pre>" }
         end
     end
 end

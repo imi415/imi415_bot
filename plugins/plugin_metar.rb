@@ -6,7 +6,7 @@ module BotPlugins
         def self.process(message)
             command_array = message.text.split(' ')
             if command_array.length != 2 then
-                return { chat_id: message.chat_id, text: "Usage: <pre>/metar ICAO</pre>" }
+                return { chat_id: message.chat.id, text: "Usage: <pre>/metar ICAO</pre>" }
             end
 
             icao = command_array.last
@@ -23,25 +23,25 @@ module BotPlugins
                     req.headers['Content-Type'] = 'application/json'
                 end
             rescue Faraday::BadRequestError
-                return { chat_id: message.chat_id, text: "Bad request." } # Whoops!
+                return { chat_id: message.chat.id, text: "Bad request." } # Whoops!
             rescue Faraday::ResourceNotFound
-                return { chat_id: message.chat_id, text: "Not found." } # This won't happen.
+                return { chat_id: message.chat.id, text: "Not found." } # This won't happen.
             end
 
             # Parse response body
             begin
                 response_json = JSON.parse(response.body)
             rescue JSON::ParserError
-                return { chat_id: message.chat_id, text: "JSON parse error!" }
+                return { chat_id: message.chat.id, text: "JSON parse error!" }
             end
 
             # We got an error
             if response_json["error"] != nil then
-                return { chat_id: message.chat_id, text: response_json["error"] }
+                return { chat_id: message.chat.id, text: response_json["error"] }
             end
 
             # Normal raw METAR response
-            { chat_id: message.chat_id, text: "<pre>#{response_json["raw"]}</pre>" }
+            { chat_id: message.chat.id, text: "<pre>#{response_json["raw"]}</pre>" }
         end
     end
 end
