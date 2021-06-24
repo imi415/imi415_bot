@@ -41,7 +41,7 @@ module BotPlugins
             end
 
             # Normal raw METAR response
-            { chat_id: message.chat.id, text: "<pre>#{response_json["raw"]}</pre>" }
+            { chat_id: message.chat.id, parse_mode: "HTML", text: "<pre>#{response_json["raw"]}</pre>" }
         end
     end
 end
