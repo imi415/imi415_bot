@@ -4,7 +4,11 @@ module BotPlugins
         Name = "Hello"
 
         # Register the following commands with this plugin
-        Commands = ["/hello", "/start", "/stop"]
+        Commands = [
+            {cmd: "/hello", desc: {default: "Hello world"}},
+            {cmd: "/start", desc: {}},
+            {cmd: "/stop",  desc: {}}
+        ]
     
         # It will be called when a message start with above commands is received, do what you want here!
         def self.process(message)

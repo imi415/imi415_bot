@@ -1,12 +1,15 @@
 module BotPlugins
     module Metar
         Name = "Metar"
-        Commands = ["/metar", "/taf"]
+        Commands = [
+            { cmd: "/metar", desc: { default: "Get weather information about an airport" }},
+            { cmd: "/taf", desc: { default: "Get weather forecast around an airport" }}
+        ]
 
         def self.process(message)
             command_array = message.text.split(' ')
             if command_array.length != 2 then
-                return { chat_id: message.chat.id, text: "Usage: <pre>/metar ICAO</pre>" }
+                return { chat_id: message.chat.id, parse_mode: "HTML", text: "Usage: \n<pre>/metar ICAO</pre>\n<pre>/taf ICAO</pre>" }
             end
 
             icao = command_array.last

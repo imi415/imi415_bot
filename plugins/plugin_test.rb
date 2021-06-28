@@ -1,7 +1,9 @@
 module BotPlugins
     module Test
         Name = "Test"
-        Commands = ["/test"]
+        Commands = [
+            { cmd: "/test", desc: { default: "A test command." }}
+        ]
 
         def self.process(message)
           { chat_id: message.chat.id, text: "<pre>This is a test plugin.</pre>" }
