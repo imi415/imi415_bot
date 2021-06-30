@@ -47,7 +47,7 @@ module BotPlugins
                     end
                     api = api_result[:text]
                     # Raw
-                    response = "<b>Raw: </b><pre>#{api["raw"]}</pre>"
+                    response = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
 
                     # Airport
                     response += "<b>Station: </b>#{api["station"]}\n"
