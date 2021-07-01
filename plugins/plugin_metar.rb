@@ -129,7 +129,12 @@ module BotPlugins
                             req.headers['Content-Type'] = 'application/json'
                         end
 
-                        { has_errors: false, text: JSON.parse(response.body) }
+                        response_hash = JSON.parse(response.body)
+                        if response_hash["error"] then
+                            { has_errors: true, text: "Error: #{response_hash["error"]}\nHelp: #{response_hash["help"]}"
+                        else
+                            { has_errors: false, text: response_hash }
+                        end
                     rescue Faraday::BadRequestError
                         return { has_errors: true, text: "Bad request." } # Whoops!
                     rescue Faraday::ResourceNotFound
