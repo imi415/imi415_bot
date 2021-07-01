@@ -10,14 +10,14 @@ pm = PluginManager.new("./plugins")
 pm.register
 
 
-begin
-  Telegram::Bot::Client.run(ENV["BOT_TOKEN"]) do |bot|
-        bot.api.set_my_commands pm.my_commands
-        bot.listen do | message |
+Telegram::Bot::Client.run(ENV["BOT_TOKEN"]) do |bot|
+    bot.api.set_my_commands pm.my_commands
+    bot.listen do | message |
+        begin
             bot.api.send_message pm.message_hook(message)
+        rescue Telegram::Bot::Exceptions::ResponseError => e
+            p "Telegram API error: #{e}"
         end
     end
-rescue Telegram::Bot::Exceptions::ResponseError => e
-    p "Caught a response error message! #{e}"
 end
 
