@@ -108,10 +108,12 @@ module BotPlugins
                 end
 
                 def handle_taf(icao)
-                    api_result = api_request("https://avwx.rest/api/taf/#{icao}")["raw"]
+                    api_result = api_request("https://avwx.rest/api/taf/#{icao}")
                     if api_result[:has_errors] then
                         return api_result[:text]
                     end
+
+                    api_result[:raw]
                 end
 
                 private
