@@ -131,7 +131,7 @@ module BotPlugins
 
                         response_hash = JSON.parse(response.body)
                         if response_hash["error"] then
-                            { has_errors: true, text: "Error: #{response_hash["error"]}\nHelp: #{response_hash["help"]}"
+                            { has_errors: true, text: "Error: #{response_hash["error"]}\nHelp: #{response_hash["help"]}" }
                         else
                             { has_errors: false, text: response_hash }
                         end
