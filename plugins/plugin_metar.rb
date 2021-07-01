@@ -113,7 +113,7 @@ module BotPlugins
                         return api_result[:text]
                     end
 
-                    api_result[:text][:raw]
+                    api_result[:text]["raw"]
                 end
 
                 private
