@@ -1,3 +1,5 @@
+require 'logger'
+
 require 'bundler'
 Bundler.require
 
@@ -5,7 +7,29 @@ require './lib/plugin_manager'
 require 'telegram/bot'
 
 Dotenv.load
-pm = PluginManager.new("./plugins")
+
+log_level = Logger::WARN
+
+unless ENV['LOG_LEVEL'].nil? then
+    case ENV["LOG_LEVEL"]
+    when "DEBUG"
+        log_level = Logger::DEBUG
+    when "INFO"
+        log_level = Logger::INFO
+    when "WARN"
+        log_level = Logger::WARN
+    when "ERROR"
+        log_level = Logger::ERROR
+    when "FATAL"
+        log_level = Logger::FATAL
+    when "UNKNOWN"
+        log_level = Logger::UNKNOWN
+    else
+        puts "Unkown log level #{ENV["LOG_LEVEL"]}"
+    end
+end
+
+pm = PluginManager.new("./plugins", log_level)
 
 pm.register
 

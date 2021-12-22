@@ -1,6 +1,8 @@
 class PluginManager
-    def initialize(plugin_dir)
+    def initialize(plugin_dir, log_level = Logger::INFO)
         @plugin_dir = plugin_dir
+        @logger = Logger.new(STDOUT)
+        @logger.level = log_level
     end
 
     def register
@@ -9,7 +11,7 @@ class PluginManager
             begin
                 require "#{@plugin_dir}/#{f}"
             rescue LoadError => e
-                puts "Load plugin failed: #{f}"
+                @logger.error "Load plugin failed: #{f}"
             end
         end
 
@@ -19,13 +21,14 @@ class PluginManager
             const.is_a? Module # It should be a module.
         }
 
-        puts "Loaded #{@plugins_list.count} plugins."
+        @logger.info "Loaded #{@plugins_list.count} plugins."
     end
 
     def my_commands()
         command_array = []
         @plugins_list.each do |plugin|
             plugin::Commands.each do |cmd|
+                @logger.debug "Registered command #{cmd} from plugin #{plugin}"
                 command_array.push({
                     command: cmd[:cmd][1..-1],
                     description: cmd[:desc][:default].nil? ? "No description available." : cmd[:desc][:default]
@@ -33,17 +36,28 @@ class PluginManager
             end
         end
 
+        @logger.info "Registered #{command_array.count} commands from #{@plugins_list.count} plugins."
+
         { commands: command_array }
     end
 
     def message_hook(message)
+        @logger.info "Command #{message.hash} issued by #{message.chat.id}: #{message.text}"
         command_text = message.text.split(' ').first
         @plugins_list.each do | plugin |
             command_list = plugin::Commands.select{|command| command[:cmd] == command_text}
             if command_list.first then
-                return plugin::process(message)
+                @logger.info "Command #{message.hash} handled by plugin #{plugin}"
+
+                result = plugin::process(message)
+
+                @logger.info "Command #{message.hash} returned from plugin"
+                @logger.debug "Command #{message.hash} result: #{result}"
+                return result
             end
         end
+        @logger.info "Command #{message.hash} is not handled, text: #{message.text}."
+
         return { chat_id: message.chat.id, text: "PM: No such command! #{command_text}" }
     end
 
