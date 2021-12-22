@@ -47,16 +47,20 @@ module BotPlugins
                     end
                     api = api_result[:text]
                     # Raw
-                    response = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
+                    response = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n\n"
 
                     # Airport
                     response += "<b>Station: </b>#{api["station"]}\n"
 
                     # Time
-                    response += "<b>Time: </b>#{api["time"]["repr"]} (#{(Time.now - Time.iso8601(api["time"]["dt"])).to_i}s ago)\n"
+                    response += "<b>Report time: </b>#{api["time"]["repr"]} (#{(Time.now - Time.iso8601(api["time"]["dt"])).to_i}s ago)\n"
 
                     # Wind
-                    response += "<b>Wind: </b>#{api["wind_speed"]["value"]}#{api["units"]["wind_speed"]} at #{api["wind_direction"]["value"]} degrees"
+                    if api["wind_direction"]["value"].nil? then
+                        response += "<b>Wind: </b>Variable, #{api["wind_speed"]["value"]}#{api["units"]["wind_speed"]}"
+                    else
+                        response += "<b>Wind: </b>#{api["wind_speed"]["value"]}#{api["units"]["wind_speed"]} at #{api["wind_direction"]["value"]} degrees"
+                    end
                     unless api["wind_gust"].nil? then
                         response += ", gust #{api["wind_gust"]["value"]}#{api["units"]["wind_speed"]}"
                     end
@@ -67,6 +71,28 @@ module BotPlugins
 
                     # Visibility
                     response += "<b>Visibility: </b>#{api["visibility"]["value"]}#{api["units"]["visibility"]}\n"
+
+                    # Runway visibility
+                    unless api["runway_visibility"].empty? then
+                        api["runway_visibility"].each do |rwy|
+                            response += "<b>Runway #{rwy["runway"]} visibility: </b>"
+                            unless rwy["visibility"].nil?
+                                # Add static visibility here
+                                unless rwy["visibility"]["value"].nil?
+                                    # PNNN, Past NNN
+                                    response += "#{rwy["visibility"]["value"].to_s}"
+                                else
+                                    # Specific number condition
+                                    response += "#{rwy["visibility"]["spoken"]}"
+                                end
+                            else
+                                # Variable visibility
+                                response += "Variable, #{rwy["variable_visibility"][0]["value"].to_s} to #{rwy["variable_visibility"][1]["value"].to_s}"
+                            end
+
+                            response += ", #{rwy["trend"]["value"]}\n"
+                        end
+                    end
 
                     # Clouds
                     unless api["clouds"].empty? then
@@ -85,7 +111,7 @@ module BotPlugins
 
                     # Weather codes
                     unless api["wx_codes"].empty? then
-                        response += "<b>Additional weather: </b>"
+                        response += "<b>Additional weather conditions: </b>"
                         api["wx_codes"].each do |wx|
                             response += "#{wx["value"]}, "
                         end
@@ -113,7 +139,17 @@ module BotPlugins
                         return api_result[:text]
                     end
 
-                    api_result[:text]["raw"]
+                    api = api_result[:text]
+
+                    # Raw forecast
+                    result = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
+
+                    # Airport
+                    response += "<b>Station: </b>#{api["station"]}\n"
+
+                    # Time
+                    response += "<b>Report time: </b>#{api["time"]["repr"]} (#{(Time.now - Time.iso8601(api["time"]["dt"])).to_i}s ago)\n"
+
                 end
 
                 private
