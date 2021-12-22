@@ -43,7 +43,15 @@ class PluginManager
 
     def message_hook(message)
         @logger.info "Command #{message.hash} issued by #{message.chat.id}: #{message.text}"
+
+        if message.text.nil?
+            @logger.info "Command #{message.hash} has invalid text field."
+            @logger.debug "Command #{message.hash}: #{message.inspect}"
+            return { chat_id: message.chat.id, text: "Message type not supported!" }
+        end
+
         command_text = message.text.split(' ').first
+
         @plugins_list.each do | plugin |
             command_list = plugin::Commands.select{|command| command[:cmd] == command_text}
             if command_list.first then
