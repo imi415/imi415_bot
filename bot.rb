@@ -38,7 +38,10 @@ Telegram::Bot::Client.run(ENV["BOT_TOKEN"]) do |bot|
     bot.api.set_my_commands pm.my_commands
     bot.listen do | message |
         begin
-            bot.api.send_message pm.message_hook(message)
+            response = pm.message_hook(message)
+            unless response.nil?
+                bot.api.send_message response
+            end
         rescue Telegram::Bot::Exceptions::ResponseError => e
             p "Telegram API error: #{e}"
         end

@@ -46,8 +46,8 @@ class PluginManager
 
         if message.text.nil?
             @logger.info "Command #{message.hash} has invalid text field."
-            @logger.debug "Command #{message.hash}: #{message.inspect}"
-            return { chat_id: message.chat.id, text: "Message type not supported!" }
+            @logger.debug "Unsupported command #{message.hash}: #{message.inspect}"
+            return nil
         end
 
         command_text = message.text.split(' ').first
