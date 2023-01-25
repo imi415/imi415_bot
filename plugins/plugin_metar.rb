@@ -46,6 +46,11 @@ module BotPlugins
                         return api_result[:text]
                     end
                     api = api_result[:text]
+
+                    unless api["error"].nil?
+                        return api["error"]
+                    end
+
                     # Raw
                     response = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n\n"
 
@@ -141,6 +146,10 @@ module BotPlugins
 
                     api = api_result[:text]
 
+                    unless api["error"].nil?
+                        return api["error"]
+                    end
+
                     # Raw forecast
                     result = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
 
@@ -150,6 +159,7 @@ module BotPlugins
                     # Time
                     response += "<b>Report time: </b>#{api["time"]["repr"]} (#{(Time.now - Time.iso8601(api["time"]["dt"])).to_i}s ago)\n"
 
+                    response
                 end
 
                 private
