@@ -151,7 +151,7 @@ module BotPlugins
                     end
 
                     # Raw forecast
-                    result = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
+                    response = "<b>Raw: </b><pre>#{api["raw"]}</pre>\n"
 
                     # Airport
                     response += "<b>Station: </b>#{api["station"]}\n"
