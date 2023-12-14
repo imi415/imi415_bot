@@ -7,7 +7,7 @@ class PluginManager
 
     def register
         file_names = Dir.glob("*.rb", base: @plugin_dir)
-        file_names.each do | f |
+        file_names.each do |f|
             begin
                 require "#{@plugin_dir}/#{f}"
             rescue LoadError => e
@@ -15,9 +15,9 @@ class PluginManager
             end
         end
 
-        @plugins_list = BotPlugins.constants.map {|const|
+        @plugins_list = BotPlugins.constants.map { |const|
             BotPlugins.const_get(const)
-        }.select {|const|
+        }.select { |const|
             const.is_a? Module # It should be a module.
         }
 
@@ -30,9 +30,9 @@ class PluginManager
             plugin::Commands.each do |cmd|
                 @logger.debug "Registered command #{cmd} from plugin #{plugin}"
                 command_array.push({
-                    command: cmd[:cmd][1..-1],
-                    description: cmd[:desc][:default].nil? ? "No description available." : cmd[:desc][:default]
-                })
+                                       command: cmd[:cmd][1..-1],
+                                       description: cmd[:desc][:default].nil? ? "No description available." : cmd[:desc][:default]
+                                   })
             end
         end
 
@@ -42,33 +42,39 @@ class PluginManager
     end
 
     def message_hook(message)
-        @logger.info "Command #{message.hash} issued by #{message.chat.id}: #{message.text}"
+        case message
+        when Telegram::Bot::Types::Message
+            if message.text.nil?
+                @logger.info "Command #{message.hash} issued by #{message.chat.id} has invalid text field."
+                @logger.debug "Unsupported command #{message.hash}: #{message.inspect}"
+                return nil
+            else
+                @logger.info "Command #{message.hash} issued by #{message.chat.id}: #{message.text}"
+            end
 
-        if message.text.nil?
-            @logger.info "Command #{message.hash} has invalid text field."
-            @logger.debug "Unsupported command #{message.hash}: #{message.inspect}"
+            command_text = message.text.split(' ').first
+
+            @plugins_list.each do |plugin|
+                command_list = plugin::Commands.select { |command| command[:cmd] == command_text }
+                if command_list.first then
+                    @logger.info "Command #{message.hash} handled by plugin #{plugin}"
+
+                    result = plugin::process(message)
+
+                    @logger.info "Command #{message.hash} returned from plugin"
+                    @logger.debug "Command #{message.hash} result: #{result}"
+                    return result
+                end
+            end
+            @logger.info "Command #{message.hash} is not handled, text: #{message.text}."
+
+            return { chat_id: message.chat.id, text: "PM: No such command! #{command_text}" }
+
+        when Telegram::Bot::Types::ChatMemberUpdated
+            @logger.info "ChatMemberUpdated"
             return nil
         end
-
-        command_text = message.text.split(' ').first
-
-        @plugins_list.each do | plugin |
-            command_list = plugin::Commands.select{|command| command[:cmd] == command_text}
-            if command_list.first then
-                @logger.info "Command #{message.hash} handled by plugin #{plugin}"
-
-                result = plugin::process(message)
-
-                @logger.info "Command #{message.hash} returned from plugin"
-                @logger.debug "Command #{message.hash} result: #{result}"
-                return result
-            end
-        end
-        @logger.info "Command #{message.hash} is not handled, text: #{message.text}."
-
-        return { chat_id: message.chat.id, text: "PM: No such command! #{command_text}" }
     end
 
-    def inline_hook(message)
-    end
+    def inline_hook(message) end
 end
